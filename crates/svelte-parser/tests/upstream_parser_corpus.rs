@@ -125,9 +125,13 @@ fn test_upstream_svelte_parser_samples() {
     );
 
     if !failures.is_empty() {
+        let limit = env::var("SVELTE_FAILURE_LIMIT")
+            .ok()
+            .and_then(|v| v.parse::<usize>().ok())
+            .unwrap_or(50);
         let preview = failures
             .iter()
-            .take(50)
+            .take(limit)
             .cloned()
             .collect::<Vec<_>>()
             .join("\n");
@@ -135,10 +139,10 @@ fn test_upstream_svelte_parser_samples() {
             "Found {} parser parity gaps.\n{}\n{}",
             failures.len(),
             preview,
-            if failures.len() > 50 {
-                "\n(truncated to first 50 failures)"
+            if failures.len() > limit {
+                format!("\n(truncated to first {limit} failures)")
             } else {
-                ""
+                String::new()
             }
         );
     }
