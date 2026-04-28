@@ -7,7 +7,7 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use svelte_parser::parse;
+use svelte_parser::{parse_with_options, ParseOptions};
 
 const SUITES: &[&str] = &["parser-modern", "parser-legacy"];
 
@@ -104,7 +104,11 @@ fn test_upstream_svelte_parser_samples() {
 
         let source = fs::read_to_string(&sample.input_path)
             .unwrap_or_else(|e| panic!("Failed to read {}: {e}", sample.input_path.display()));
-        let result = parse(&normalize_input(source));
+        let options = ParseOptions {
+            loose: sample.loose,
+            ..ParseOptions::default()
+        };
+        let result = parse_with_options(&normalize_input(source), options);
         checked += 1;
 
         if !result.errors.is_empty() {
